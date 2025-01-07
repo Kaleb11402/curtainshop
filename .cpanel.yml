@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export NODE_ENV=production # Set the environment to production
+    - /usr/local/bin/npm install # Install dependencies
+    - /usr/local/bin/npm run build # Run Sequelize migrations (optional)
+    - /usr/local/bin/npm start # Start the server
