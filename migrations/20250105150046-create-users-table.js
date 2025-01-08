@@ -16,6 +16,7 @@ module.exports = {
       email: {
         type: Sequelize.TEXT,
         allowNull: false,
+        unique: true,
       },
       password: {
         type: Sequelize.TEXT,
@@ -52,6 +53,7 @@ module.exports = {
       phone: {
         type: Sequelize.BIGINT,
         allowNull: false,
+        unique: true,
       },
       company_name: {
         type: Sequelize.STRING(255),
