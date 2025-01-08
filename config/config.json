@@ -1,10 +1,11 @@
 {
     "development": {
-        "username": "postgres",
-        "password": "pgpass",
-        "database": "ikizcurtaincom_ikiz_shop",
-        "host": "localhost",
-        "dialect": "postgres"
+      "username": "root",
+      "password": "root",
+      "database": "ikizcurtaincom_prshop",
+      "host": "localhost",
+      "port":"3306",
+      "dialect": "mysql"
     },
     "test": {
       "username": "your_db_user",
