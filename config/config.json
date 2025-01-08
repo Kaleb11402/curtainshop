@@ -14,10 +14,11 @@
       "dialect": "postgres"
     },
     "production": {
-      "username": "ikizcurtaincom@localhost",
-      "password": "$Q_STZAeMaS?",
-      "database": "ikizcurtaincom_ikiz_shop",
+      "username": "ikizcurtaincom_kr",
+      "password": "curtainPassword",
+      "database": "ikizcurtaincom_prshop",
       "host": "localhost",
+      "port":"3306",
       "dialect": "mysql"
     }
   }

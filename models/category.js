@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
-        defaultValue: sequelize.literal('gen_random_uuid()'), // Generate UUID automatically
+        defaultValue: DataTypes.UUIDV4, // Generates UUID using Sequelize
       },
       name: {
         type: DataTypes.STRING(255),
