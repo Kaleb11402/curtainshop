@@ -33,29 +33,19 @@ module.exports = (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true, // Ensure user_id remains as the primary key
         references: {
           model: 'users', // References the users table
           key: 'id',
         },
       },
-      created_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       modelName: 'Session',
-      tableName: 'session',
-      underscored: true, // Ensures snake_case column names
-      timestamps: true,  // Enables createdAt and updatedAt timestamps
+      tableName: 'sessions', // Ensure consistency with migrations
+      underscored: true, // Use snake_case for column names
+      timestamps: true,  // Enables createdAt and updatedAt
     }
   );
 
