@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.UUID,
         allowNull: false,
+        primaryKey: true,
         references: {
           model: 'users', // References the users table
           key: 'id',

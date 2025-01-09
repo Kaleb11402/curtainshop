@@ -1,5 +1,6 @@
 // controllers/userController.js
 const Joi = require('joi');
+const bcrypt = require('bcrypt');
 const { User } = require('../models'); // Import User model
 // Define the validation schema
 const userSchema = Joi.object({
@@ -24,9 +25,13 @@ const userSchema = Joi.object({
         return res.status(400).json({
           success: false,
           message: error.details[0].message,
-          error:'Validation error' ,
+          error: 'Validation error',
         });
       }
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(value.password, 10); // 10 is the salt rounds
+      value.password = hashedPassword; // Replace plain password with hashed password
   
       // Create the user
       const user = await User.create(value);
@@ -43,7 +48,7 @@ const userSchema = Joi.object({
         return res.status(409).json({
           success: false,
           message: error.errors[0].message,
-          error:'Duplicate entry error' , // Extracts the database error message
+          error: 'Duplicate entry error', // Extracts the database error message
         });
       }
   
@@ -53,7 +58,7 @@ const userSchema = Joi.object({
         error: error.message,
       });
     }
-  };  
+  };
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
