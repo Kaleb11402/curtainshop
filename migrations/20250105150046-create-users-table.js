@@ -28,27 +28,27 @@ module.exports = {
       },
       telegram: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       tik_tok: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       instagram: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       facebook: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       language: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       address: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       phone: {
         type: Sequelize.BIGINT,
@@ -57,7 +57,7 @@ module.exports = {
       },
       company_name: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,

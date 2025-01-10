@@ -41,27 +41,27 @@ module.exports = (sequelize, DataTypes) => {
       },
       telegram: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       tik_tok: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       instagram: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       facebook: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       language: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       address: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       phone: {
         type: DataTypes.BIGINT,
@@ -69,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       company_name: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       created_at: {
         type: DataTypes.DATE,
