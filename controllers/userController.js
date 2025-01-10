@@ -4,19 +4,20 @@ const bcrypt = require('bcrypt');
 const { User } = require('../models'); // Import User model
 // Define the validation schema
 const userSchema = Joi.object({
-    name: Joi.string().min(3).max(50).required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).max(30).required(),
-    type: Joi.string(),
-    telegram: Joi.string().optional(),
-    tik_tok: Joi.string().optional(),
-    instagram: Joi.string().optional(),
-    facebook: Joi.string().optional(),
-    language: Joi.string().optional(),
-    address: Joi.string().optional(),
-    phone: Joi.string().optional(),
-    company_name: Joi.string().optional(),
-  });
+  name: Joi.string().min(3).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).max(30).required(),
+  type: Joi.string(),
+  telegram: Joi.string().allow(null, '').optional(),
+  tik_tok: Joi.string().allow(null, '').optional(),
+  instagram: Joi.string().allow(null, '').optional(),
+  facebook: Joi.string().allow(null, '').optional(),
+  language: Joi.string().allow(null, '').optional(),
+  address: Joi.string().allow(null, '').optional(),
+  phone: Joi.string().allow(null, '').optional(),
+  company_name: Joi.string().allow(null, '').optional(),
+});
+
   exports.createUser = async (req, res) => {
     try {
       // Validate the request body

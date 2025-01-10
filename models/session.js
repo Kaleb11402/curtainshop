@@ -22,6 +22,12 @@ module.exports = (sequelize, DataTypes) => {
 
   Session.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4, // Generates UUID using Sequelize
+      },
       available: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -33,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true, // Ensure user_id remains as the primary key
+        // primaryKey: true, // Ensure user_id remains as the primary key
         references: {
           model: 'users', // References the users table
           key: 'id',

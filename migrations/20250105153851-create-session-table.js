@@ -3,6 +3,12 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('sessions', { // Use plural naming convention
+      id: { // Add the id column as the primary key
+        type: Sequelize.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: Sequelize.UUIDV4, // Automatically generate UUID
+      },
       available: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
@@ -14,7 +20,7 @@ module.exports = {
       user_id: {
         type: Sequelize.UUID,
         allowNull: false,
-        primaryKey: true, // Use user_id as primary key
+        // primaryKey: true, // Use user_id as primary key
         references: {
           model: 'users', // References the users table
           key: 'id',
