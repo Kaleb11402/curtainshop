@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       });
-      Product.hasMany(ProductImage, {
+      Product.hasMany(models.ProductImage, {
         foreignKey: 'product_id',
         as: 'images', // Alias for the association
         onDelete: 'CASCADE',

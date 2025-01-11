@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
-      ProductImage.belongsTo(Product, {
+      ProductImage.belongsTo(models.Product, {
         foreignKey: 'product_id',
         as: 'product',
         onDelete: 'CASCADE',
