@@ -157,6 +157,45 @@ exports.updateCategory = async (req, res) => {
   });
 };
 
+// Delete Category
+exports.deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params; // Category ID
+
+    // Find the category by ID
+    const category = await Category.findByPk(id);
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found',
+      });
+    }
+
+    // Delete the category image file
+    const imagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/categories', path.basename(category.img_url));
+
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath); // Remove the file
+    }
+
+    // Delete the category record
+    await category.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: 'Category deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting category:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete category',
+      error: error.message,
+    });
+  }
+};
+
 exports.createProduct = async (req, res) => {
   const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
   const uploader = createUploader(uploadDir).array('images'); // Array of images

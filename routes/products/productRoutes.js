@@ -8,6 +8,7 @@ const productController = require('../../controllers/productController');
 router.post('/category', productController.createCategory);  // Create a category
 router.get('/category', productController.getAllCategories);
 router.put('/category/:id', productController.updateCategory);
+router.delete('/category/:id', productController.deleteCategory);
 router.post('', productController.createProduct);
 router.get('', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
