@@ -10,7 +10,7 @@ exports.createCategory = async (req, res) => {
   // Use the uploader middleware
   uploader(req, res, async (err) => {
     if (err) {
-      console.log("Here is the error ", err)
+      console.log("Here is the error ", err);
       return res.status(400).json({
         success: false,
         message: err.message,
@@ -24,6 +24,16 @@ exports.createCategory = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: 'Image file is required!',
+        });
+      }
+
+      // Check if the category name already exists
+      const existingCategory = await Category.findOne({ where: { name } });
+
+      if (existingCategory) {
+        return res.status(400).json({
+          success: false,
+          message: 'Category name already exists!',
         });
       }
 
@@ -51,6 +61,7 @@ exports.createCategory = async (req, res) => {
     }
   });
 };
+
 
 exports.getAllCategories = async (req, res) => {
   try {
