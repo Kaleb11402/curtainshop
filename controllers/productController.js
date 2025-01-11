@@ -82,12 +82,10 @@ exports.getAllCategories = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
-  const uploader = createUploader(uploadDir).array('images', 5); // Limit to 5 images, you can adjust
+  const uploader = createUploader(uploadDir).array('images'); // Array of images
 
-  // Use the uploader middleware for handling the images
   uploader(req, res, async (err) => {
     if (err) {
-      console.log("Error uploading files: ", err);
       return res.status(400).json({
         success: false,
         message: err.message,
@@ -95,12 +93,12 @@ exports.createProduct = async (req, res) => {
     }
 
     try {
-      const { title, price, description, tik_tok, category_id } = req.body;
+      const { title, price, description, category_id, tik_tok } = req.body;
 
       if (!req.files || req.files.length === 0) {
         return res.status(400).json({
           success: false,
-          message: 'At least one product image is required!',
+          message: 'At least one image is required!',
         });
       }
 
@@ -109,25 +107,39 @@ exports.createProduct = async (req, res) => {
         title,
         price,
         description,
-        tik_tok,
         category_id,
+        tik_tok,
       });
 
-      // Create product image entries for each uploaded image
-      const productImages = req.files.map(file => ({
-        product_id: product.id,
-        img_url: `https://ikizcurtain.com/curtainshop/uploads/products/${file.filename}`,
-      }));
+      // Create ProductImage records for each uploaded file
+      const imageRecords = await Promise.all(
+        req.files.map(file => {
+          const imageUrl = `https://ikizcurtain.com/curtainshop/uploads/products/${file.filename}`;
+          return ProductImage.create({
+            product_id: product.id,
+            img_url: imageUrl,
+          });
+        })
+      );
 
-      await ProductImage.bulkCreate(productImages); // Insert multiple images for the product
+      // Fetch the created product along with its images
+      const createdProduct = await Product.findOne({
+        where: { id: product.id },
+        include: [
+          {
+            model: ProductImage,
+            as: 'images', // Alias used in the association
+          },
+        ],
+      });
 
       res.status(201).json({
         success: true,
         message: 'Product created successfully!',
-        data: product,
+        data: createdProduct,
       });
     } catch (error) {
-      console.error("Error creating product: ", error.message);
+      console.error(error.message);
       res.status(500).json({
         success: false,
         message: 'Failed to create product',
