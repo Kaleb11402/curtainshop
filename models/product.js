@@ -17,15 +17,23 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       });
+      // Product.hasMany(models.ProductImage, {
+      //   foreignKey: 'product_id',
+      //   as: 'images', // Alias for the association
+      //   onDelete: 'CASCADE',
+      //   onUpdate: 'CASCADE',
+      // });
       Product.hasMany(models.ProductImage, {
         foreignKey: 'product_id',
-        as: 'images', // Alias for the association
+        as: 'images', // Alias used in the `include` option
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+      
+      
     }
   }
-  
+
   Product.init(
     {
       id: {

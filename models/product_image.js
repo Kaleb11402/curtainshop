@@ -11,12 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {   
       // Define associations here
+      // ProductImage.belongsTo(models.Product, {
+      //   foreignKey: 'product_id',
+      //   as: 'product',
+      //   onDelete: 'CASCADE',
+      //   onUpdate: 'CASCADE',
+      // });
       ProductImage.belongsTo(models.Product, {
         foreignKey: 'product_id',
-        as: 'product',
+        as: 'product', // Alias for reverse association (optional)
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-      });
+      });      
+      
+      
     }
   }
 
