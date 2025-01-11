@@ -4,7 +4,7 @@ const { Category } = require('../models'); // Sequelize model
 
 exports.createCategory = async (req, res) => {
   // Dynamically create the uploader for category images
-  const uploadDir = path.join(__dirname, './../../public_html/curtainshop/uploads/categories');
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/categories');
   const uploader = createUploader(uploadDir).single('image');
 
   // Use the uploader middleware
