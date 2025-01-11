@@ -9,5 +9,5 @@ router.post('/category', productController.createCategory);  // Create a categor
 router.get('/category', productController.getAllCategories);
 router.post('', productController.createProduct);
 router.get('', productController.getAllProducts);
-router.get('/:id', productController.getAllProducts);
+router.get('/:id', productController.getProductById);
 module.exports = router;
