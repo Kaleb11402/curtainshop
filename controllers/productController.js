@@ -28,7 +28,7 @@ exports.createCategory = async (req, res) => {
       }
 
       // Construct the image URL
-      const imgUrl = `/uploads/categories/${req.file.filename}`;
+      const imgUrl = `https://ikizcurtain.com/curtainshop/uploads/categories/${req.file.filename}`;
 
       // Create the category
       const category = await Category.create({
