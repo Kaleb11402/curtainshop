@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       });
+      Product.hasMany(ProductImage, {
+        foreignKey: 'product_id',
+        as: 'images', // Alias for the association
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
 
