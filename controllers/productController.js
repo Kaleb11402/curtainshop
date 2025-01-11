@@ -362,3 +362,50 @@ exports.addProductImages = async (req, res) => {
     }
   });
 };
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params; // Product ID
+
+    // Find the product by ID
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    // Fetch all associated product images
+    const productImages = await ProductImage.findAll({ where: { product_id: id } });
+
+    // Delete images from the file system
+    for (const image of productImages) {
+      const filename = path.basename(image.img_url);
+      const imagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/products', filename);
+
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath); // Remove the file
+      }
+
+      // Delete image record from the database
+      await image.destroy();
+    }
+
+    // Delete the product record
+    await product.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: 'Product deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting product:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete product',
+      error: error.message,
+    });
+  }
+};
