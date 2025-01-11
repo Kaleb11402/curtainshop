@@ -1,6 +1,6 @@
 const path = require('path');
 const createUploader = require('../utils/fileUploadUtil'); // Adjust path as needed
-const { Category } = require('../models'); // Sequelize model
+const { Category, Product } = require('../models'); // Sequelize model
 
 exports.createCategory = async (req, res) => {
   // Dynamically create the uploader for category images
