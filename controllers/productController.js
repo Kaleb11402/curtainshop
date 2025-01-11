@@ -291,3 +291,74 @@ exports.updateProduct = async (req, res) => {
     });
   }
 };
+
+exports.addProductImages = async (req, res) => {
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
+  const uploader = createUploader(uploadDir).array('images'); // To handle multiple images
+
+  uploader(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: 'Image upload failed',
+        error: err.message,
+      });
+    }
+
+    try {
+      const { id } = req.params; // Product ID
+
+      // Check if the product exists
+      const product = await Product.findByPk(id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found',
+        });
+      }
+
+      // Check the current number of images for the product
+      const existingImagesCount = await ProductImage.count({ where: { product_id: id } });
+      const newImagesCount = req.files.length;
+
+      if (existingImagesCount + newImagesCount > 5) {
+        return res.status(400).json({
+          success: false,
+          message: 'A product can have a maximum of 5 images',
+        });
+      }
+
+      // Save the new images to the database
+      const newImages = req.files.map((file) => ({
+        product_id: id,
+        img_url: `https://ikizcurtain.com/curtainshop/uploads/products/${file.filename}`,
+      }));
+      await ProductImage.bulkCreate(newImages);
+
+      // Fetch updated product with images
+      const updatedProduct = await Product.findOne({
+        where: { id },
+        include: [
+          {
+            model: ProductImage,
+            as: 'images',
+            attributes: ['img_url'],
+          },
+        ],
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Images added successfully',
+        data: updatedProduct,
+      });
+    } catch (error) {
+      console.error('Error adding product images:', error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to add images',
+        error: error.message,
+      });
+    }
+  });
+};
