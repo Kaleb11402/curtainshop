@@ -217,3 +217,77 @@ exports.getAllProducts = async (req, res) => {
     });
   }
 };
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params; // Product ID
+    const { title, price, description, tik_tok, category_id, delete_images } = req.body;
+
+    // Find the product by ID
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    // Update the product fields
+    await product.update({
+      title,
+      price,
+      description: description ? JSON.parse(description) : product.description,
+      tik_tok,
+      category_id,
+    });
+
+    // Delete specific images if requested
+    if (delete_images) {
+      const imagesToDelete = JSON.parse(delete_images); // Parse the JSON array of image URLs
+      for (const imgUrl of imagesToDelete) {
+        // Extract the filename from the URL
+        const filename = path.basename(imgUrl);
+        const imagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/products', filename);
+
+        // Find the image record in the database
+        const image = await ProductImage.findOne({ where: { img_url: imgUrl, product_id: id } });
+
+        if (image) {
+          // Delete the image file from the filesystem
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath); // Remove the file from the directory
+          }
+
+          // Delete the image record from the database
+          await image.destroy();
+        }
+      }
+    }
+
+    // Fetch the updated product with images
+    const updatedProduct = await Product.findOne({
+      where: { id },
+      include: [
+        {
+          model: ProductImage,
+          as: 'images',
+          attributes: ['img_url'],
+        },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      data: updatedProduct,
+    });
+  } catch (error) {
+    console.error('Error updating product:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update product',
+      error: error.message,
+    });
+  }
+};
