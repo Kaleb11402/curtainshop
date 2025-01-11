@@ -149,6 +149,46 @@ exports.createProduct = async (req, res) => {
   });
 };
 
+exports.getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the product by ID with associated images
+    const product = await Product.findOne({
+      where: { id },
+      include: [
+        {
+          model: ProductImage,
+          as: 'images', // Alias defined in the association
+          attributes: ['img_url'], // Include only the img_url column
+        },
+      ],
+    });
+
+    // If no product is found
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    // Return the product with associated images
+    res.status(200).json({
+      success: true,
+      message: 'Product retrieved successfully',
+      data: product,
+    });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve product',
+      error: error.message,
+    });
+  }
+};
+
 // Get all products with their associated images
 exports.getAllProducts = async (req, res) => {
   try {
