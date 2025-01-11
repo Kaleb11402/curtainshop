@@ -80,54 +80,81 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
-// Update Category
+// Update Category Controller
 exports.updateCategory = async (req, res) => {
-  try {
-    const { id } = req.params; // Category ID
-    const { name } = req.body;
+  // Dynamically create the uploader for category images
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/categories');
+  const uploader = createUploader(uploadDir).single('image');
 
-    // Find the category by ID
-    const category = await Category.findByPk(id);
-
-    if (!category) {
-      return res.status(404).json({
+  // Use the uploader middleware
+  uploader(req, res, async (err) => {
+    if (err) {
+      console.log("Here is the error ", err);
+      return res.status(400).json({
         success: false,
-        message: 'Category not found',
+        message: err.message,
       });
     }
 
-    // If image is provided, handle image update
-    let imgUrl = category.img_url;
-    if (req.file) {
-      // Delete the old image file
-      const oldImagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/categories', path.basename(category.img_url));
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath); // Remove the file
+    try {
+      const { id } = req.params; // Category ID
+      const { name } = req.body;
+
+      // Find the category by ID
+      const category = await Category.findByPk(id);
+
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: 'Category not found',
+        });
       }
 
-      // Construct the new image URL
-      imgUrl = `https://ikizcurtain.com/curtainshop/uploads/categories/${req.file.filename}`;
+      // Check if the new category name already exists (and is not the same as the current one)
+      if (name && name !== category.name) {
+        const existingCategory = await Category.findOne({ where: { name } });
+
+        if (existingCategory) {
+          return res.status(400).json({
+            success: false,
+            message: 'Category name already exists!',
+          });
+        }
+      }
+
+      // Handle image update if a new image is uploaded
+      let imgUrl = category.img_url;
+      if (req.file) {
+        // Delete the old image file
+        const oldImagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/categories', path.basename(category.img_url));
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath); // Remove the file
+        }
+
+        // Construct the new image URL
+        imgUrl = `https://ikizcurtain.com/curtainshop/uploads/categories/${req.file.filename}`;
+      }
+
+      // Update the category
+      await category.update({
+        name,
+        img_url: imgUrl,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Category updated successfully!',
+        data: category,
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update category',
+        error: error.message,
+      });
     }
-
-    // Update the category
-    await category.update({
-      name,
-      img_url: imgUrl,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Category updated successfully!',
-      data: category,
-    });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update category',
-      error: error.message,
-    });
-  }
+  });
 };
 
 exports.createProduct = async (req, res) => {
