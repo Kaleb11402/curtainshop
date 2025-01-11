@@ -79,3 +79,60 @@ exports.getAllCategories = async (req, res) => {
     });
   }
 };
+
+exports.createProduct = async (req, res) => {
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
+  const uploader = createUploader(uploadDir).array('images', 5); // Limit to 5 images, you can adjust
+
+  // Use the uploader middleware for handling the images
+  uploader(req, res, async (err) => {
+    if (err) {
+      console.log("Error uploading files: ", err);
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    try {
+      const { title, price, description, tik_tok, category_id } = req.body;
+
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'At least one product image is required!',
+        });
+      }
+
+      // Create the product
+      const product = await Product.create({
+        title,
+        price,
+        description,
+        tik_tok,
+        category_id,
+      });
+
+      // Create product image entries for each uploaded image
+      const productImages = req.files.map(file => ({
+        product_id: product.id,
+        img_url: `https://ikizcurtain.com/curtainshop/uploads/products/${file.filename}`,
+      }));
+
+      await ProductImage.bulkCreate(productImages); // Insert multiple images for the product
+
+      res.status(201).json({
+        success: true,
+        message: 'Product created successfully!',
+        data: product,
+      });
+    } catch (error) {
+      console.error("Error creating product: ", error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create product',
+        error: error.message,
+      });
+    }
+  });
+};
