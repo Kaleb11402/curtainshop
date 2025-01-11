@@ -11,7 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // Define associations here, if any
-      // Example: Category.hasMany(models.Product, { foreignKey: 'category_id' });
+      Category.hasMany(models.Product, { foreignKey: 'category_id', as: 'products', // Alias used in the `include` option
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE', });
     }
   }
 

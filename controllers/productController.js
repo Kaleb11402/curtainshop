@@ -525,3 +525,49 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+// Get Category with Products and Product Images by Category ID
+exports.getCategoryWithProducts = async (req, res) => {
+  try {
+    const { id } = req.params; // Category ID
+
+    // Find the category by ID, including associated products and their images
+    const category = await Category.findOne({
+      where: { id },
+      include: [
+        {
+          model: Product,
+          as: 'products',  // Alias for the relation
+          attributes: ['id', 'title', 'price', 'description', 'tik_tok'], // Specify fields to return for the products
+          include: [
+            {
+              model: ProductImage,
+              as: 'images',  // Alias for product images
+              attributes: ['id', 'img_url'],  // Fields to return from product_image table
+            }
+          ],
+        }
+      ],
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Category and products fetched successfully!',
+      data: category,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch category with products',
+      error: error.message,
+    });
+  }
+};
