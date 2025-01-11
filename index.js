@@ -5,17 +5,22 @@ const { sequelize } = require('./models');
 const userRoutes = require('./routes/users/userRoutes');
 const authRoutes = require('./routes/auth/authRoutes');
 const productRoutes = require('./routes/products/productRoutes');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'public_html/curtainshop/uploads')));
 app.use(express.json());
 app.use('/api', userRoutes);
 app.use('/api/auth', authRoutes );
-
+app.use('/api/product', productRoutes );
 sequelize.sync().then(() => {
     console.log('Database connected successfully');
     app.listen(PORT, () => {
