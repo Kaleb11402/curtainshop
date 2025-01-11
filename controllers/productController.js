@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const createUploader = require('../utils/fileUploadUtil'); // Adjust path as needed
 const { Category, Product, ProductImage } = require('../models'); // Sequelize model
 
