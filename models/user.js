@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       email: {
         type: DataTypes.TEXT,
         allowNull: false,
+        unique: true,
       },
       password: {
         type: DataTypes.TEXT,
@@ -66,6 +67,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: {
         type: DataTypes.BIGINT,
         allowNull: false,
+        unique: true,
       },
       company_name: {
         type: DataTypes.STRING(255),
