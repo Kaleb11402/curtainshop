@@ -126,6 +126,38 @@ const updateUserSchema = Joi.object({
     }
   };
   
+  exports.deleteUser = async (req, res) => {
+    try {
+      const userId = req.params.id; // Assuming the user ID is passed as a route parameter
+  
+      // Find the user by ID
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found',
+          error: 'User not found',
+        });
+      }
+  
+      // Delete the user
+      await user.destroy();
+  
+      res.status(200).json({
+        success: true,
+        message: 'User deleted successfully',
+      });
+    } catch (error) {
+      console.error(error);
+  
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete user',
+        error: error.message,
+      });
+    }
+  };
+  
 
 // Get all users
 exports.getAllUsers = async (req, res) => {

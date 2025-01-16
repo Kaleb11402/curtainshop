@@ -9,4 +9,5 @@ router.post('/users', userController.createUser);  // Create a user
 router.get('/users', userController.getAllUsers);  // Get all users
 router.get('/users/:id', userController.getUserById);  // Get user by ID
 router.put('/users/:id', userController.updateUser);
+router.delete('/users/:id', userController.deleteUser);
 module.exports = router;
