@@ -18,6 +18,19 @@ const userSchema = Joi.object({
   company_name: Joi.string().allow(null, '').optional(),
 });
 
+const updateUserSchema = Joi.object({
+  name: Joi.string().min(3).max(50).required(),
+  email: Joi.string().email().required(),
+  type: Joi.string(),
+  telegram: Joi.string().allow(null, '').optional(),
+  tik_tok: Joi.string().allow(null, '').optional(),
+  instagram: Joi.string().allow(null, '').optional(),
+  facebook: Joi.string().allow(null, '').optional(),
+  language: Joi.string().allow(null, '').optional(),
+  address: Joi.string().allow(null, '').optional(),
+  phone: Joi.string().allow(null, '').optional(),
+  company_name: Joi.string().allow(null, '').optional(),
+});
   exports.createUser = async (req, res) => {
     try {
       // Validate the request body
@@ -60,6 +73,60 @@ const userSchema = Joi.object({
       });
     }
   };
+
+  exports.updateUser = async (req, res) => {
+    try {
+      const userId = req.params.id; // Assuming you're passing the user ID as a route parameter
+  
+      // Validate the request body
+      const { error, value } = updateUserSchema.validate(req.body);
+      if (error) {
+        return res.status(400).json({
+          success: false,
+          message: error.details[0].message,
+          error: 'Validation error',
+        });
+      }
+  
+      // Find the user by ID
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found',
+          error: 'User not found',
+        });
+      }
+  
+      // Update the user with the new data
+      await user.update(value);
+  
+      res.status(200).json({
+        success: true,
+        message: 'User updated successfully',
+        data: user,
+      });
+    } catch (error) {
+      console.error(error);
+  
+      // Check if the error is a duplicate entry
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({
+          success: false,
+          message: error.errors[0].message,
+          error: 'Duplicate entry error',
+        });
+      }
+  
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update user',
+        error: error.message,
+      });
+    }
+  };
+  
+
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
