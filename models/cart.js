@@ -51,6 +51,14 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      total_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
