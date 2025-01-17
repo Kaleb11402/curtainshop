@@ -35,7 +35,6 @@ exports.loginUser = async (req, res) => {
       const token = jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
       );
       // Check if session exists
       const session = await Session.findOne({ where: { user_id: user.id } });

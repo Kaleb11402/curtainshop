@@ -174,3 +174,46 @@ exports.addToCart = async (req, res) => {
     }
   };
   
+  exports.deleteCartItem = async (req, res) => {
+    try {
+      const user_id = req.user.id; // Extract user ID from middleware
+      const { cart_id, product_id } = req.body;
+  
+      // Ensure at least one identifier is provided
+      if (!cart_id && !product_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Either cart_id or product_id is required to delete an item.',
+        });
+      }
+  
+      // Build the query condition
+      const condition = { user_id }; // User-specific cart
+      if (cart_id) condition.id = cart_id;
+      if (product_id) condition.product_id = product_id;
+  
+      // Check if the cart item exists
+      const cartItem = await Cart.findOne({ where: condition });
+      if (!cartItem) {
+        return res.status(404).json({
+          success: false,
+          message: 'Cart item not found.',
+        });
+      }
+  
+      // Delete the cart item
+      await Cart.destroy({ where: condition });
+  
+      res.status(200).json({
+        success: true,
+        message: 'Cart item deleted successfully.',
+      });
+    } catch (error) {
+      console.error('Error deleting cart item:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete cart item.',
+        error: error.message,
+      });
+    }
+  };
