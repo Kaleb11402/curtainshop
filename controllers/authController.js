@@ -39,7 +39,6 @@ exports.loginUser = async (req, res) => {
       // Check if session exists
       const session = await Session.findOne({ where: { user_id: user.id } });
       if (session) {
-        console.log("Here is the session", session)
         // Update the session
         await session.update({ data: token, available: true });
       } else {
@@ -65,3 +64,52 @@ exports.loginUser = async (req, res) => {
       });
     }
   };
+
+  exports.logout = async (req, res) => {
+    try {
+      const user_id = req.user.id;
+      const authToken = req.headers.authorization; // Get the authorization token from the request headers
+      console.log("Auth token ", authToken)
+      const session = await Session.findOne({
+        where: { user_id: user_id },
+      });
+  
+      if (!session) {
+        return res.status(404).json({
+          success: false,
+          message: 'Session not found.',
+        });
+      }
+  
+      if (!session.available) {
+        return res.status(404).json({
+          success: false,
+          message: 'The user already logged out!',
+        });
+      }
+  
+      if (session.data !== authToken) {
+        return res.status(401).json({
+          success: false,
+          message: "The token is expired",
+        });
+      }
+      
+      // Invalidate the session
+      session.available = false;
+      session.data = '';
+      await session.save();
+  
+      res.status(200).json({
+        success: true,
+        message: 'User logged out successfully.',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error.',
+      });
+    }
+  };
+  

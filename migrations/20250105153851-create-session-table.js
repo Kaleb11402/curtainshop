@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       data: {
-        type: Sequelize.JSON,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       user_id: {
