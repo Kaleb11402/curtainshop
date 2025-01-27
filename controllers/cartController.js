@@ -64,7 +64,7 @@ exports.addToCart = async (req, res) => {
   
   
   
-  exports.updateCartQuantity = async (req, res) => {
+exports.updateCartQuantity = async (req, res) => {
     try {
       const user_id = req.user.id; // Extract user_id from the middleware
       const { product_id, quantity } = req.body;
@@ -117,7 +117,7 @@ exports.addToCart = async (req, res) => {
     }
   };
   
-  exports.getCartItems = async (req, res) => {
+exports.getCartItems = async (req, res) => {
     try {
       const user_id = req.user.id; // Extract user_id from middleware
   
@@ -173,8 +173,63 @@ exports.addToCart = async (req, res) => {
       });
     }
   };
+  exports.getCartItemsByUserID = async (req, res) => {
+    try {
+      const user_id = req.params.id; // Extract user_id from middleware
   
-  exports.deleteCartItem = async (req, res) => {
+      // Fetch all cart items for the user with their product and image details
+      const cartItems = await Cart.findAll({
+        where: { user_id },
+        include: [
+          {
+            model: Product,
+            as: 'product', // Use the alias defined in the Cart model association
+            attributes: ['id', 'title', 'description', 'price'], // Get product details
+            include: [
+              {
+                model: ProductImage,
+                as: 'images', // Matches the alias defined in Product-ProductImage association
+                attributes: ['img_url'], // Specify the image URL column
+              },
+            ],
+          },
+        ],
+      });
+  
+      if (!cartItems || cartItems.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No items found in the cart.',
+        });
+      }
+  
+      // Map the result to include product and image details with cart info
+      const cartWithProductInfo = cartItems.map((item) => ({
+        cart_id: item.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        total_price: item.total_price,
+        product: {
+          ...item.product.get(),
+          images: item.product.images.map((img) => img.img_url), // Extract image URLs
+        },
+      }));
+  
+      res.status(200).json({
+        success: true,
+        message: 'Cart items fetched successfully.',
+        data: cartWithProductInfo,
+      });
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch cart items.',
+        error: error.message,
+      });
+    }
+  };
+exports.deleteCartItem = async (req, res) => {
     try {
       const user_id = req.user.id; // Extract user ID from middleware
       const { cart_id, product_id } = req.body;
