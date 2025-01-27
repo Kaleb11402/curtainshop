@@ -209,7 +209,7 @@ exports.createProduct = async (req, res) => {
     }
 
     try {
-      const { title, price, description, category_id, tik_tok } = req.body;
+      let { title, price, description, category_id, tik_tok } = req.body;
 
       if (!req.files || req.files.length === 0) {
         return res.status(400).json({
@@ -217,12 +217,13 @@ exports.createProduct = async (req, res) => {
           message: 'At least one image is required!',
         });
       }
+      //description = JSON.stringify(description);
 
       // Create the product
       const product = await Product.create({
         title,
         price,
-        description,
+        description:JSON.parse(description),
         category_id,
         tik_tok,
       });
@@ -276,7 +277,7 @@ exports.getProductById = async (req, res) => {
         {
           model: ProductImage,
           as: 'images', // Alias defined in the association
-          attributes: ['img_url'], // Include only the img_url column
+          attributes: ['id','img_url'],
         },
       ],
     });
@@ -288,7 +289,7 @@ exports.getProductById = async (req, res) => {
         message: 'Product not found',
       });
     }
-
+    product.description = JSON.parse(product.description);
     // Return the product with associated images
     res.status(200).json({
       success: true,
@@ -567,6 +568,110 @@ exports.getCategoryWithProducts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch category with products',
+      error: error.message,
+    });
+  }
+};
+
+exports.updateProductImage = async (req, res) => {
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
+  const uploader = createUploader(uploadDir).single('image'); // Single image upload
+
+  uploader(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    const { id } = req.params; // Image ID passed as a route parameter
+
+    try {
+      // Find the existing ProductImage by ID
+      const productImage = await ProductImage.findByPk(id);
+
+      if (!productImage) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product image not found!',
+        });
+      }
+
+      // Check if a new file is uploaded
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'New image file is required!',
+        });
+      }
+
+      // Construct the full path of the old image file
+      const oldImagePath = path.join(uploadDir, path.basename(productImage.img_url));
+
+      // Delete the old image file
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+
+      // Generate the new image URL
+      const newImageUrl = `https://ikizcurtain.com/curtainshop/uploads/products/${req.file.filename}`;
+
+      // Update the database record with the new image URL
+      productImage.img_url = newImageUrl;
+      await productImage.save();
+
+      res.status(200).json({
+        success: true,
+        message: 'Product image updated successfully!',
+        data: productImage,
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update product image',
+        error: error.message,
+      });
+    }
+  });
+};
+
+exports.deleteProductImage = async (req, res) => {
+  const { id } = req.params; // Image ID passed as a route parameter
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
+
+  try {
+    // Find the ProductImage by ID
+    const productImage = await ProductImage.findByPk(id);
+
+    if (!productImage) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product image not found!',
+      });
+    }
+
+    // Construct the full path of the image file
+    const imagePath = path.join(uploadDir, path.basename(productImage.img_url));
+
+    // Delete the image file from the server
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    // Remove the record from the database
+    await productImage.destroy();
+
+    res.status(200).json({
+      success: true,
+      message: 'Product image deleted successfully!',
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete product image',
       error: error.message,
     });
   }
