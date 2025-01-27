@@ -6,7 +6,8 @@ const userRoutes = require('./routes/users/userRoutes');
 const authRoutes = require('./routes/auth/authRoutes');
 const productRoutes = require('./routes/products/productRoutes');
 const cartRoutes = require('./routes/carts/cartRoutes');
-const favouriteRoutes = require('./routes/favourite/favouriteRoutes')
+const favouriteRoutes = require('./routes/favourite/favouriteRoutes');
+const promotionRoutes = require('./routes/promotion/promotionRoutes');
 const path = require('path');
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes );
 app.use('/api/product', productRoutes );
 app.use('/api/cart', cartRoutes);
 app.use('/api/favourite', favouriteRoutes);
+app.use('/api/promotion', promotionRoutes);
 sequelize.sync().then(() => {
     console.log('Database connected successfully');
     app.listen(PORT, () => {
