@@ -11,22 +11,22 @@ module.exports = {
       },
       title: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       img_url: {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      // created_at: {
-      //   type: Sequelize.DATE,
-      //   allowNull: false,
-      //   defaultValue: Sequelize.NOW,
-      // },
-      // updated_at: {
-      //   type: Sequelize.DATE,
-      //   allowNull: false,
-      //   defaultValue: Sequelize.NOW,
-      // },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
     });
   },
 
