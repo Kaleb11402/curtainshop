@@ -12,7 +12,7 @@ const loginSchema = Joi.object({
 exports.loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
-  
+      loginSchema.validate({ email, password });
       // Find the user by email
       const user = await User.findOne({ where: { email } });
       if (!user) {

@@ -1,7 +1,7 @@
 {
     "development": {
       "username": "root",
-      "password": "root",
+      "password": "pgpass",
       "database": "ikizcurtaincom_prshop",
       "host": "localhost",
       "port":"3306",

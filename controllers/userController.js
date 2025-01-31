@@ -162,7 +162,10 @@ const updateUserSchema = Joi.object({
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      order: [['id', 'DESC']], // Orders by 'id' in descending order
+    });
+
     res.status(200).json({
       success: true,
       data: users,
@@ -176,6 +179,7 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
 
 // Get a single user by ID
 exports.getUserById = async (req, res) => {
