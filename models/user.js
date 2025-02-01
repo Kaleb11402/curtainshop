@@ -69,6 +69,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      status:{
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
       company_name: {
         type: DataTypes.STRING(255),
         allowNull: true,

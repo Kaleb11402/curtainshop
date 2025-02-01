@@ -30,6 +30,7 @@ const updateUserSchema = Joi.object({
   address: Joi.string().allow(null, '').optional(),
   phone: Joi.string().allow(null, '').optional(),
   company_name: Joi.string().allow(null, '').optional(),
+  status: Joi.string().allow(null, '').optional(),
 });
   exports.createUser = async (req, res) => {
     try {
@@ -46,7 +47,7 @@ const updateUserSchema = Joi.object({
       // Hash the password
       const hashedPassword = await bcrypt.hash(value.password, 10); // 10 is the salt rounds
       value.password = hashedPassword; // Replace plain password with hashed password
-  
+      value.status = 'active';
       // Create the user
       const user = await User.create(value);
   
@@ -126,6 +127,49 @@ const updateUserSchema = Joi.object({
     }
   };
   
+  exports.updateUserStatus = async (req, res) => {
+    try {
+        const userId = req.params.id; // Get user ID from route parameter
+        const { status } = req.body; // Get status from request body
+
+        // Validate status field (should be 'active' or 'inactive')
+        if (!["active", "inactive"].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid status value. Allowed values: 'active' or 'inactive'.",
+                error: "Validation error",
+            });
+        }
+
+        // Find the user by ID
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+                error: "User not found",
+            });
+        }
+
+        // Update the user's status
+        await user.update({ status });
+
+        res.status(200).json({
+            success: true,
+            message: `User status updated to ${status}`,
+            data: user,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update user status",
+            error: error.message,
+        });
+    }
+};
+
+
   exports.deleteUser = async (req, res) => {
     try {
       const userId = req.params.id; // Assuming the user ID is passed as a route parameter

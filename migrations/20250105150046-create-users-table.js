@@ -50,6 +50,10 @@ module.exports = {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      status:{
+        type: Sequelize.STRING(255),
+        allowNull: true,
+      },
       phone: {
         type: Sequelize.BIGINT,
         allowNull: false,

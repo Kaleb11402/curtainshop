@@ -21,7 +21,12 @@ exports.loginUser = async (req, res) => {
           message: 'User not found',
         });
       }
-  
+      if (user.status !== 'active') {
+        return res.status(401).json({
+          success: false,
+          message: 'User is not active',
+        });
+      }
       // Compare passwords
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
