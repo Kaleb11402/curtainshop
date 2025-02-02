@@ -250,3 +250,23 @@ exports.getUserById = async (req, res) => {
     });
   }
 };
+
+exports.countUserType = async (req, res) => {
+  try {
+    const userCount = await User.count({
+      where: { type: 'user' }, // Count only users with type "user"
+    });
+
+    res.status(200).json({
+      success: true,
+      totalUsers: userCount,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to count users with type "user"',
+      error: error.message,
+    });
+  }
+};
