@@ -120,7 +120,7 @@ exports.loginUser = async (req, res) => {
   
   exports.countSessions = async (req, res) => {
     try {
-      const totalSession = await Session.count();
+      const totalSession = await Session.count().where({ available: true });
   
       res.status(200).json({
         success: true,
