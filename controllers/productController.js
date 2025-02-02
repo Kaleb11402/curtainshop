@@ -675,3 +675,21 @@ exports.deleteProductImage = async (req, res) => {
     });
   }
 };
+
+exports.countProducts = async (req, res) => {
+  try {
+    const productCount = await Product.count();
+
+    res.status(200).json({
+      success: true,
+      totalProducts: productCount,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to count products',
+      error: error.message,
+    });
+  }
+};

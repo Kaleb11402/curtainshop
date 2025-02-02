@@ -18,4 +18,6 @@ router.delete('/:id', productController.deleteProduct);
 router.get('/category/:id/products', productController.getCategoryWithProducts);
 router.put('/product-images/:id', productController.updateProductImage);
 router.delete('/product-images/:id', productController.deleteProductImage);
+//count
+router.get('/count/products', productController.countProducts);
 module.exports = router;
