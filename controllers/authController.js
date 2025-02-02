@@ -118,3 +118,20 @@ exports.loginUser = async (req, res) => {
     }
   };
   
+  exports.countSessions = async (req, res) => {
+    try {
+      const totalSession = await Session.count();
+  
+      res.status(200).json({
+        success: true,
+        totalSessions: totalSession,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to count sessions',
+        error: error.message,
+      });
+    }
+  }
