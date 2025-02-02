@@ -252,6 +252,7 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.countUserType = async (req, res) => {
+  console.log("Counting users with type 'user'");
   try {
     const userCount = await User.count({
       where: { type: 'user' }, // Count only users with type "user"
