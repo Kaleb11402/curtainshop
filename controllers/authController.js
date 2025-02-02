@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt'); // To compare passwords
 const jwt = require('jsonwebtoken'); // To generate JWT
 const Joi = require('joi'); // Validation library
 const { User, Session } = require('../models'); // Import User model
+const { where } = require('sequelize');
 
 // Define the login validation schema
 const loginSchema = Joi.object({
@@ -120,7 +121,9 @@ exports.loginUser = async (req, res) => {
   
   exports.countSessions = async (req, res) => {
     try {
-      const totalSession = await Session.count().where({ available: true });
+      const totalSession = await Session.count({
+        where: { available: true },
+      })
   
       res.status(200).json({
         success: true,
