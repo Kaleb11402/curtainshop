@@ -29,7 +29,7 @@ const createUploader = (dirPath) => {
     storage,
     limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB limit
     fileFilter: (req, file, cb) => {
-      const allowedTypes = /jpeg|jpg|png/;
+      const allowedTypes = /jpeg|jpg|png|webp/;
       const extName = allowedTypes.test(path.extname(file.originalname).toLowerCase());
       const mimeType = allowedTypes.test(file.mimetype);
       if (extName && mimeType) {
