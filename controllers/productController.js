@@ -346,7 +346,7 @@ exports.getAllProducts = async (req, res) => {
         {
           model: Category, // Include Category model
           as: 'category', // Matches the alias in Product.associate()
-          attributes: ['id', 'name', 'description'], // Select category fields
+          attributes: ['id', 'name'], // Select category fields
         },
       ],
       order: [['created_at', 'DESC']],
