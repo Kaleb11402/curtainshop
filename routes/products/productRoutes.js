@@ -7,6 +7,7 @@ const productController = require('../../controllers/productController');
 // Define routes for category operations
 router.post('/category', productController.createCategory);  // Create a category
 router.get('/category', productController.getAllCategories);
+router.get('/category/:id', productController.getCategoryById);
 router.put('/category/:id', productController.updateCategory);
 router.delete('/category/:id', productController.deleteCategory);
 router.post('', productController.createProduct);
