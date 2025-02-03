@@ -367,80 +367,169 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-
 exports.updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params; // Product ID
-    const { title, price, description, tik_tok, category_id, delete_images } = req.body;
+  const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
+  const uploader = createUploader(uploadDir).array('images'); // Handle multiple images
 
-    // Find the product by ID
-    const product = await Product.findByPk(id);
-
-    if (!product) {
-      return res.status(404).json({
+  uploader(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
         success: false,
-        message: 'Product not found',
+        message: 'Image upload failed',
+        error: err.message,
       });
     }
 
-    // Update the product fields
-    await product.update({
-      title,
-      price,
-      description: description ? description : product.description,
-      tik_tok,
-      category_id,
-    });
+    try {
+      const { id } = req.params;
+      const { title, price, description, tik_tok, category_id, delete_images } = req.body;
 
-    // Delete specific images if requested
-    if (delete_images) {
-      const imagesToDelete = JSON.parse(delete_images); // Parse the JSON array of image URLs
-      for (const imgUrl of imagesToDelete) {
-        // Extract the filename from the URL
-        const filename = path.basename(imgUrl);
-        const imagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/products', filename);
+      // Find the product
+      const product = await Product.findByPk(id);
+      if (!product) {
+        return res.status(404).json({ success: false, message: 'Product not found' });
+      }
 
-        // Find the image record in the database
-        const image = await ProductImage.findOne({ where: { img_url: imgUrl, product_id: id } });
+      // Update product fields
+      await product.update({
+        title,
+        price,
+        description: description || product.description,
+        tik_tok,
+        category_id,
+      });
 
-        if (image) {
-          // Delete the image file from the filesystem
-          if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath); // Remove the file from the directory
+      // Handle image deletions
+      if (delete_images) {
+        const imagesToDelete = JSON.parse(delete_images);
+        for (const imgUrl of imagesToDelete) {
+          const filename = path.basename(imgUrl);
+          const imagePath = path.join(uploadDir, filename);
+
+          const image = await ProductImage.findOne({ where: { img_url: imgUrl, product_id: id } });
+
+          if (image) {
+            if (fs.existsSync(imagePath)) {
+              fs.unlinkSync(imagePath); // Delete image file
+            }
+            await image.destroy(); // Delete record from database
           }
-
-          // Delete the image record from the database
-          await image.destroy();
         }
       }
+
+      // Handle new image uploads
+      if (req.files && req.files.length > 0) {
+        const existingImagesCount = await ProductImage.count({ where: { product_id: id } });
+
+        if (existingImagesCount + req.files.length > 5) {
+          return res.status(400).json({
+            success: false,
+            message: 'A product can have a maximum of 5 images',
+          });
+        }
+
+        const newImages = req.files.map((file) => ({
+          product_id: id,
+          img_url: `https://ikizcurtain.com/curtainshop/uploads/products/${file.filename}`,
+        }));
+        await ProductImage.bulkCreate(newImages);
+      }
+
+      // Fetch the updated product with images
+      const updatedProduct = await Product.findOne({
+        where: { id },
+        include: [{ model: ProductImage, as: 'images', attributes: ['img_url'] }],
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Product updated successfully',
+        data: updatedProduct,
+      });
+    } catch (error) {
+      console.error('Error updating product:', error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update product',
+        error: error.message,
+      });
     }
-
-    // Fetch the updated product with images
-    const updatedProduct = await Product.findOne({
-      where: { id },
-      include: [
-        {
-          model: ProductImage,
-          as: 'images',
-          attributes: ['img_url'],
-        },
-      ],
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Product updated successfully',
-      data: updatedProduct,
-    });
-  } catch (error) {
-    console.error('Error updating product:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update product',
-      error: error.message,
-    });
-  }
+  });
 };
+
+// exports.updateProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params; // Product ID
+//     const { title, price, description, tik_tok, category_id, delete_images } = req.body;
+
+//     // Find the product by ID
+//     const product = await Product.findByPk(id);
+
+//     if (!product) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product not found',
+//       });
+//     }
+
+//     // Update the product fields
+//     await product.update({
+//       title,
+//       price,
+//       description: description ? description : product.description,
+//       tik_tok,
+//       category_id,
+//     });
+
+//     // Delete specific images if requested
+//     if (delete_images) {
+//       const imagesToDelete = JSON.parse(delete_images); // Parse the JSON array of image URLs
+//       for (const imgUrl of imagesToDelete) {
+//         // Extract the filename from the URL
+//         const filename = path.basename(imgUrl);
+//         const imagePath = path.join(__dirname, '../../../public_html/curtainshop/uploads/products', filename);
+
+//         // Find the image record in the database
+//         const image = await ProductImage.findOne({ where: { img_url: imgUrl, product_id: id } });
+
+//         if (image) {
+//           // Delete the image file from the filesystem
+//           if (fs.existsSync(imagePath)) {
+//             fs.unlinkSync(imagePath); // Remove the file from the directory
+//           }
+
+//           // Delete the image record from the database
+//           await image.destroy();
+//         }
+//       }
+//     }
+
+//     // Fetch the updated product with images
+//     const updatedProduct = await Product.findOne({
+//       where: { id },
+//       include: [
+//         {
+//           model: ProductImage,
+//           as: 'images',
+//           attributes: ['img_url'],
+//         },
+//       ],
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       message: 'Product updated successfully',
+//       data: updatedProduct,
+//     });
+//   } catch (error) {
+//     console.error('Error updating product:', error.message);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to update product',
+//       error: error.message,
+//     });
+//   }
+// };
 
 exports.addProductImages = async (req, res) => {
   const uploadDir = path.join(__dirname, '../../../public_html/curtainshop/uploads/products');
