@@ -340,8 +340,13 @@ exports.getAllProducts = async (req, res) => {
       include: [
         {
           model: ProductImage,
-          as: 'images', // Matches the alias defined in the association
-          attributes: [ 'img_url'], // Specify existing columns
+          as: 'images', // Matches the alias in association
+          attributes: ['img_url'], // Select specific columns
+        },
+        {
+          model: Category, // Include Category model
+          as: 'category', // Matches the alias in Product.associate()
+          attributes: ['id', 'name', 'description'], // Select category fields
         },
       ],
       order: [['created_at', 'DESC']],
@@ -361,6 +366,7 @@ exports.getAllProducts = async (req, res) => {
     });
   }
 };
+
 
 exports.updateProduct = async (req, res) => {
   try {
