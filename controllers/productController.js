@@ -65,7 +65,9 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      order: [['created_at', 'DESC']], // Orders by 'id' in descending order added
+    });
     res.status(200).json({
       success: true,
       data: categories,
