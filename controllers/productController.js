@@ -306,6 +306,11 @@ exports.getProductById = async (req, res) => {
           as: 'images', // Alias defined in the association
           attributes: ['id','img_url'],
         },
+        {
+          model: Category, // Include Category model
+          as: 'category', // Matches the alias in Product.associate()
+          attributes: ['id', 'name'], // Select category fields
+        },
       ],
     });
 
