@@ -399,7 +399,7 @@ exports.updateProduct = async (req, res) => {
       await product.update({
         title,
         price,
-        description: description || product.description,
+        description: JSON.parse(description || product.description),
         tik_tok,
         category_id,
       });
