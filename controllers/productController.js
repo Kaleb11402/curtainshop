@@ -407,19 +407,20 @@ exports.updateProduct = async (req, res) => {
       // Handle image deletions
       if (delete_images) {
         const imagesToDelete = JSON.parse(delete_images);
-        for (const imgUrl of imagesToDelete) {
-          const filename = path.basename(imgUrl);
-          const imagePath = path.join(uploadDir, filename);
+for (const imageId of imagesToDelete) {
+  const image = await ProductImage.findOne({ where: { id: imageId, product_id: id } });
 
-          const image = await ProductImage.findOne({ where: { img_url: imgUrl, product_id: id } });
+  if (image) {
+    const filename = path.basename(image.img_url);
+    const imagePath = path.join(uploadDir, filename);
 
-          if (image) {
-            if (fs.existsSync(imagePath)) {
-              fs.unlinkSync(imagePath); // Delete image file
-            }
-            await image.destroy(); // Delete record from database
-          }
-        }
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath); // Delete image file
+    }
+    await image.destroy(); // Delete record from database
+  }
+}
+
       }
 
       // Handle new image uploads
